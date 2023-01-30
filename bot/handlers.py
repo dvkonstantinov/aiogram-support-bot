@@ -10,6 +10,7 @@ from filter_media import SupportedMediaFilter
 
 load_dotenv()
 GROUP_ID = os.getenv("GROUP_ID")
+GROUP_TYPE = os.getenv('GROUP_TYPE', default='group')
 
 router = Router()
 
@@ -26,7 +27,7 @@ def extract_user_id(message: Message) -> int:
 @router.message(Command(commands=["start"]))
 async def command_start(message: Message) -> None:
     await message.answer(
-        "Привет! Мы - команда поддержки ILAASPEСT. Если у вас есть вопрос, "
+        "Привет! Мы - команда поддержки. Если у вас есть вопрос, "
         "напишите нам, мы с радостью на него ответим.\n"
         "Мы работаем по будням с 9:00 до 18:00, но можем ответить и в другое "
         "время, если не будем заняты:)",
@@ -48,7 +49,7 @@ async def send_message_to_group(message: Message, bot: Bot):
 
 
 @router.message(Command(commands="info"),
-                F.chat.type == 'supergroup',
+                F.chat.type == GROUP_TYPE,
                 F.reply_to_message)
 async def get_user_info(message: Message, bot: Bot):
     def get_name(chat: Chat):
@@ -78,7 +79,7 @@ async def get_user_info(message: Message, bot: Bot):
                              f'username: {username}')
 
 
-@router.message(F.chat.type == 'supergroup', F.reply_to_message)
+@router.message(F.chat.type == GROUP_TYPE, F.reply_to_message)
 async def send_message_answer(message: Message):
     try:
         chat_id = extract_user_id(message.reply_to_message)
